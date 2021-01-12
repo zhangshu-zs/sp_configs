@@ -1,0 +1,53 @@
+spring:
+  application:
+    name: zuul
+  cloud:
+   config:
+     override-none: true 
+# 表示禁止配置中心的配置信息覆盖项目中的配置信息
+# 原因是配置中心的配置优先级高，会导致我们的指定端口号启动多台服务器失效
+# --service.port=8001
+# --service.port=8002
+    
+server:
+  port: 3001
+  
+eureka:
+  client:
+    service-url:
+      defaultZone: http://eureka1:2001/eureka, http://eureka2:2002/eureka
+
+#  表示开启重试和设置 zuul 不过滤这些Cookie的协议头
+# zuul默认拦截的cookie头有：Cookie，Set-Cookie，Authorization
+zuul:
+  retryable: true
+  sensitive-headers: Set-Cookie
+# 这个是zuul网关API默认的配置，可以不写，表示根据访问路径自动决定访问哪个服务
+# zuul的路由配置
+# zuul:
+#  routes:
+#    item-service: /item-service/**
+#    order-service: /order-service/**
+#    user-service: /user-service/**
+    
+       
+    
+ribbon:
+  ConnectTimeout: 1000
+  ReadTimeout: 2000
+  MaxAutoRetriesNextServer: 1
+  MaxAutoRetries: 1
+  
+hystrix:
+  command:
+    default:
+      execution:
+        isolation:
+          thread:
+            timeoutInMilliseconds: 500
+            
+management:
+  endpoints:
+    web:
+      exposure:
+        include: hystrix.stream
